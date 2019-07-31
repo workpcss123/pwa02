@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple pwa app">
+  <title>PWA-01</title>
+  <link rel="manifest" href="../manifest.json">
+  <!-- Add iOS meta tags and icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Weather PWA">
+  <link rel="apple-touch-icon" href="/images/icons/icon-a-152.png">
+  <!-- Add meta theme-color -->
+  <meta name="theme-color" content="#2F3BA2" />
+  
+  <link rel="stylesheet" type="text/css" href="/styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Comunication with native app</h1>
+    <i id="browserIcon" class="fa"></i>
+  </div>
+  <div class="navbar">
+    <a onclick="window.location.reload();" href="#" class="active"><i class="fa fa-refresh"></i> Refresh</a>
+    <a onclick="window.location.href='../index.html'" href="#" class="right"><i class="fa fa-home"></i> Go home</a>
+  </div>
+  <div class="content">
+    <p>hash: 123456789123456
+    </p>
+    
+    <div class="container">
+      <h3>Send msg to native android:</h3>
+      <div class="form-elem">
+        <label>Username: </label>
+        <span><input type="text" id="username" style="width:150px"/></span>
+      </div>
+      <div class="form-elem">
+        <label>SessionId: </label>
+        <span><input type="text" id="sessionId" style="width:150px"/></span>
+      </div>
+      <button onclick="triggerAppOpen()">Open penguin</button>
+      <button onclick="triggerAppOpenUnknown()">Open unknownapp</button>
+    </div>
+    
+    <div class="container" id="containerMsgFromNative">
+      <h3>Msg from native android:</h3>
+      <p id="msgFromNative">\\empty\\ </p>
+    </div>
+    
+    <br/>
+    <button onclick="openFile()">Open file</button>
+    <br/>
+    <button onclick="openPage('trivagoPoznan')">Open trivagoPoznan</button>
+    <br/>
+    <button onclick="openPage('react02')">Open react02</button>
+    <br/>
+    <button onclick="openPage('a2hs')">Open a2hs</button>
+    <br/>
+    <button onclick="openPage('pwa01')">Open pwa01</button>
+    
+    
+    
+  </div>
+
+  <script src="../scripts/infoBrowser.js"></script>
+  <script>     
+    setBrowserIconInHeader()
+    
+    getMsgFromNative()
+      
+    function getMsgFromNative() {   
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+      function(m,key,value) {
+        vars[key] = value;
+      });
+      let msgAnd = vars["msgAnd"]
+      if (msgAnd) {
+        document.getElementById('msgFromNative').textContent = msgAnd.replace(/%20/g, " ");
+      }
+      //return vars;
+    }
+    
+    function openFile() {
+      debugger;
+      let aa = window.open('file:///D:/note.txt')
+      debugger
+    }
+    
+    
+    const username = document.getElementById('username');
+    const sessionId = document.getElementById('sessionId');
+    
+    var fallbackToStore = function() {
+      window.location.replace('market://details?id=com.facebook.katana&hl=pl');
+    };
+    var openApp = function() {
+      window.location.replace('penguin://username='+username.value+'&sessionId='+sessionId.value);
+    };
+    var triggerAppOpen = function() {
+      openApp();
+      setTimeout(fallbackToStore, 300);
+    };
+    
+    function openAppUnknown() {
+      window.location.replace('alina://username='+username.value+'&sessionId='+sessionId.value);
+    }
+    
+    function triggerAppOpenUnknown() {
+      openAppUnknown();
+      setTimeout(fallbackToStore, 250);
+    }
+    
+    function openPage(mode) {
+      let url = "https://trivago.pl";
+      if (mode == 'trivagoPoznan') {
+        url = url + "/?aDateRange%5Barr%5D=2019-08-09&aDateRange%5Bdep%5D=2019-08-11&aPriceRange%5Bfrom%5D=0&aPriceRange%5Bto%5D=0&iRoomType=1&aRooms%5B0%5D%5Badults%5D=1&cpt2=66671%2F200&iViewType=0&bIsSeoPage=0&sortingId=1&slideoutsPageItemId=&iGeoDistanceLimit=20000&address=&addressGeoCode=&offset=0&ra=";
+      } else if (mode=='react02') {
+        url = "https://alina0815.github.io/react02/"
+      } else if (mode=='a2hs') {
+        url = "https://a2hs.glitch.me/"
+      } else if (mode=='pwa01') {
+        url = "https://pwa01.glitch.me/"
+      }
+      
+      window.location.replace(url);
+    }
+    
+    function setBrowserIconInHeader() {   
+      let iconBrowser = document.getElementById('browserIcon');
+      let aa = get_browser_class_name()
+      iconBrowser.classList.add(get_browser_class_name());
+    }
+    
+  </script>
+  
+  
+</body>
+</html>

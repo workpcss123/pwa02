@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple pwa app">
+  <title>PWA-01</title>
+  <link rel="manifest" href="/manifest.json">
+  <!-- Add iOS meta tags and icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Weather PWA">
+  <link rel="apple-touch-icon" href="/images/icons/icon-a-152.png">
+  <!-- Add meta theme-color -->
+  <meta name="theme-color" content="#2F3BA2" />
+  
+  <link rel="stylesheet" type="text/css" href="/styles/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Home PWA01</h1>
+    <i id="browserIcon" class="fa"></i>
+  </div>
+  <div class="navbar">
+    <a onclick="window.location.reload();" href="#" class="active"><i class="fa fa-refresh"></i> Refresh</a>
+    <a href="#" class="right" id="btnAdd" style="display:none"><i class="fa fa-plus-circle"></i> Add to home screen</a>
+  </div>
+  <div class="content">
+    <p>hash: 1234567891234567
+    </p>
+    <button onclick="window.location.href='/pages/pushNoti.html'"><i class="fa fa-envelope"></i> Notification</button>
+    <br/>
+    <button onclick="window.location.href='/pages/photoManager.html'"><i class="fa fa-camera"></i> Photo manager</button>
+    <br/>
+    <button onclick="window.location.href='/pages/callSomeone.html'"><i class="fa fa-phone"></i> Call friend</button>
+    <br/>
+    <button onclick="window.location.href='/pages/browserTest.html'"><i class="fa fa-chrome"></i> Browser details info</button>
+    <br/>
+    <button onclick="window.location.href='/pages/comunicationWithNativeApp.html'"><i class="fa fa-commenting-o"></i> Comunication with native app</button>
+
+  </div>
+  
+  <script src="../scripts/infoBrowser.js"></script>
+  <script>
+    const btnAdd = document.getElementById('btnAdd');
+    registerServiceWorker();
+    
+    setBrowserIconInHeader();
+    
+    function registerServiceWorker() {
+      // 1. Sprawdź czy Service Worker jest obsługiwany w przeglądarce
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+          console.log('Service Worker and Push is supported');
+          // 2. Kiedy strona jest załadowana
+          window.addEventListener('load', function() {
+            // 3. Zarejestruj SW zdefiniowany w pliku znajdującym się w katalogu
+            navigator.serviceWorker.register('/service-worker.js')
+            // 4. Jeśli rejestracja się powiodła to wyświetl komunikat sukcesu
+            .then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                  // 5. Jeśli rejestracja się nie powiodła to wyświetl komunikat błędu
+                    console.log('ServiceWorker registration failed: ', err);
+              });
+            
+          });
+      } else {
+          console.warn('Push messaging is not supported');
+          pushButton.textContent = 'Push Not Supported';
+      }
+    }
+    
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      //logElem.textContent = logElem.textContent+"; platform="+e.platforms.join([separator = ','])
+      
+      
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Update UI notify the user they can add to home screen
+      btnAdd.style.display = 'block';
+    });
+    
+    btnAdd.addEventListener('click', (e) => {
+       // hide our user interface that shows our A2HS button
+      btnAdd.style.display = 'none';
+      // Show the prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      deferredPrompt.userChoice
+        .then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+    });
+    
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('a2hs installed')
+    });
+    
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      const elem = document.getElementById('appType');
+      elem.textContent = "Stronka uruchomiona z pwa. android"
+
+      console.log('display-mode is standalone');
+    }
+    
+    if (window.navigator.standalone === true) {
+      const elem = document.getElementById('appType');
+      elem.textContent = "Stronka uruchomiona z pwa. ios"
+      console.log('display-mode is standalone');
+    }
+    
+    function setBrowserIconInHeader() {   
+      let iconBrowser = document.getElementById('browserIcon');
+      let aa = get_browser_class_name()
+      iconBrowser.classList.add(get_browser_class_name());
+    }
+  
+  </script>
+
+</body>
+</html>
